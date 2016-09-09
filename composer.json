@@ -1,0 +1,15 @@
+{
+    "name": "max/dysign-base-theme-oop",
+    "description": "Base Theme",
+    "type": "theme",
+    "authors": [
+        {
+            "name": "Maxime BJ",
+            "email": "maxime@dysign.fr"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "timber/timber": "^1.1"
+    }
+}

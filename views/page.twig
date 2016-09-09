@@ -1,0 +1,14 @@
+{% extends "base.twig" %}
+
+{% block content %}
+  <main class="section page">
+    <div class="wrapper flex-container">
+      <h1 class="page__title">{{post.title}}</h1>
+      
+      <div class="content">
+        {{post.content}}
+      </div>
+
+    </div> <!-- wrapper -->
+  </main>
+{% endblock %}

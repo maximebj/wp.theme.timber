@@ -1,0 +1,28 @@
+<article class="teaser">
+  <div class="teaser__thumbnail">
+    <a href="{{post.link}}"><img src="{{post.thumbnail.src('medium')}}" alt="{{post.thumbnail.title}}"></a>
+    <div class="teaser__date">Le {{post_date}}</div>
+  </div>
+
+  <div class="teaser__meta">
+    <ul class="teaser__cats">
+    {% for term in post.terms('category') %}
+      <li><a href="{{term.link}}">{{term.name}}</a></li>
+    {% endfor %}
+    </ul>
+
+    <ul class="teaser__tags">
+    {% for term in post.terms('tags') %}
+      <li><a href="{{term.link}}">{{term.name}}</a></li>
+    {% endfor %}
+    </ul>
+  </div>
+  
+  <div class="teaser__content">
+    <h2><a href="{{post.link}}">{{post.title}}</a></h2>
+    {{post.excerpt}}
+    <p><a href="{{post.link}}" class="button--main">Lire l'article</a></p>
+  </div>
+</article>
+
+

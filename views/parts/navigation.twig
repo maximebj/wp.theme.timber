@@ -1,0 +1,19 @@
+<div class="pagination">
+{% if pagination.prev %}
+  <a href="{{pagination.prev.link}}" class="pagination__prev">Prev</a>
+{% endif %}
+  <ul class="pagination__pages">
+  {% for page in pagination.pages %}
+    <li>
+    {% if page.link %}
+      <a href="{{page.link}}" class="pagination__page">{{page.title}}</a>
+    {% else %}
+      <span class="pagination__page--active">{{page.title}}</span>
+    {% endif %}
+    </li>
+  {% endfor %}
+  </ul>
+{% if pagination.next %}
+  <a href="{{pagination.next.link}}" class="pagination__next">Next</a>
+{% endif %}
+</div> <!-- pagination -->

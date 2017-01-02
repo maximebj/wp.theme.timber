@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class Dysign_Theme_Timber extends TimberSite {
 
@@ -12,15 +12,15 @@ class Dysign_Theme_Timber extends TimberSite {
   }
 
   // Global context, available to all templates
-  function add_to_context( $context ) {
+  function add_to_context($context) {
 
     // Menus
-    $data['main_menu'] = new TimberMenu('main'); 
-    $data['footer_menu'] = new TimberMenu('footer');
+    $context['main_menu'] = new TimberMenu('main');
+    $context['footer_menu'] = new TimberMenu('footer');
 
     // Sidebar
     if(is_single() or is_archive() or is_home() or is_front_page()):
-      $data['sidebar'] = Timber::get_widgets('Blog');
+      $context['sidebar'] = Timber::get_widgets('Blog');
     endif;
 
     return $context;

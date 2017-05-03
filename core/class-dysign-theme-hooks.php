@@ -1,13 +1,14 @@
-<?php 
+<?php
 
 class Dysign_Theme_Hooks {
 
   public function execute() {
     $this->register_hooks();
+    $this->clean_wp();
   }
 
   private function register_hooks() {
-    
+
     if(MAINTENANCE) {
       add_action('get_header', array($this, 'activate_maintenance'));
     }
@@ -15,7 +16,7 @@ class Dysign_Theme_Hooks {
     // Public Hooks
 
     add_action('after_setup_theme', array($this, 'theme_setup'));
-    add_action('wp_enqueue_scripts', array($this, 'register_scripts'));
+    add_action('wp_enqueue_scripts', array($this, 'register_assets'));
     add_action('init', array($this, 'change_author_permalinks'));
     add_action('init', array($this, 'disable_wp_emojicons'));
 
@@ -24,7 +25,7 @@ class Dysign_Theme_Hooks {
     //add_filter('excerpt_more', array($this, 'set_excerpt_suffixe'));
     //add_action('wp_print_scripts', array($this, 'dequeue_scripts'), 100 );
 
-    
+
     // Admin Hooks
 
     add_filter('tiny_mce_before_init', array($this, 'customize_tinymce'));
@@ -33,23 +34,52 @@ class Dysign_Theme_Hooks {
     add_action('wp_dashboard_setup', array($this, 'add_dashboard_dysign_widget'), 1 );
     add_filter('admin_footer_text', array($this, 'change_footer'));
     add_filter('sanitize_file_name', 'remove_accents');
-    remove_action('welcome_panel', 'wp_welcome_panel');
-    
+
+
     //add_action('admin_menu', array($this, 'remove_menu_pages'));
     //add_filter('upload_mimes', array($this, 'allow_mime_types'));
     //add_action('admin_enqueue_scripts', array($this, 'admin_theme_style'));
 
+  }
 
-    // Others
 
-    add_filter('xmlrpc_enabled', '__return_false'); // Remove XML RPC
+  public function clean_wp() {
+
+    // Remove XML RPC
+    add_filter('xmlrpc_enabled', '__return_false');
+
+    // Gallery styles
+    add_filter( 'use_default_gallery_style', '__return_false' );
+
+    // Welcome panel
+    remove_action('welcome_panel', 'wp_welcome_panel');
+
+    // Head useless stuff
+    remove_action('wp_head', 'rsd_link');
+    remove_action('wp_head', 'wp_generator');
+    remove_action('wp_head', 'feed_links', 2);
+    remove_action('wp_head', 'index_rel_link');
+    remove_action('wp_head', 'wlwmanifest_link');
+    remove_action('wp_head', 'feed_links_extra', 3);
+    remove_action('wp_head', 'start_post_rel_link', 10, 0);
+    remove_action('wp_head', 'parent_post_rel_link', 10, 0);
+    remove_action('wp_head', 'adjacent_posts_rel_link', 10, 0);
+
+    // Remove Emojis
+    remove_action( 'admin_print_styles', 'print_emoji_styles' );
+    remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+    remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+    remove_action( 'wp_print_styles', 'print_emoji_styles' );
+    remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+    remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+    remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
 
   }
 
 
-  /*  ===================  */
-  /*  = Front Functions =  */
-  /*  ===================  */
+  /*  ===============  */
+  /*  = Main config =  */
+  /*  ===============  */
 
   public function theme_setup() {
 
@@ -58,8 +88,8 @@ class Dysign_Theme_Hooks {
 
     //  Thumbnails
     add_theme_support('post-thumbnails');
-    set_post_thumbnail_size(380, 230, true );
-    //add_image_size('slider', 540, 350, true);
+    set_post_thumbnail_size(800, 600, false);
+    add_image_size('fullwidth', 1920, 0, false);
 
     //  Page Title
     add_theme_support('title-tag');
@@ -85,40 +115,30 @@ class Dysign_Theme_Hooks {
     // RSS
     add_theme_support('automatic-feed-links');
 
-    // Remove post format
-    remove_theme_support('post-formats');  
   }
 
-  public function register_scripts() {
-  
-    wp_deregister_script( 'jquery' ); 
-    wp_enqueue_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js', false, '3.0.0', true);
+  public function register_assets() {
 
-    wp_enqueue_script( 'script', get_template_directory_uri().'/js/script.js', array('jquery'), '1.0', true );
+    wp_deregister_script( 'jquery' );
+    wp_register_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js', false, '3.2.1', true);
+    wp_register_script('theme-js', get_template_directory_uri().'/js/script.js', array('jquery'), '1.0', true );
+
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('theme-js');
   }
 
   public function change_author_permalinks() {
     global $wp_rewrite;
-    $wp_rewrite->author_base = 'redacteur';
-  }
-
-  public function disable_wp_emojicons() {
-    remove_action( 'admin_print_styles', 'print_emoji_styles' );
-    remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
-    remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
-    remove_action( 'wp_print_styles', 'print_emoji_styles' );
-    remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
-    remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
-    remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+    $wp_rewrite->author_base = 'auteur';
   }
 
   public function register_sidebars() {
     register_sidebar(array(
       'name' =>'Blog',
-      'before_widget'  => '<div id="%1$s" class="widget %2$s">',
+      'before_widget'  => '<div class="widget %2$s">',
       'after_widget'  => '</div>',
-      'before_title' => '<h3>',
-      'after_title' => '</h3>'
+      'before_title' => '<p>',
+      'after_title' => '</p>'
     ));
   }
 
@@ -144,15 +164,12 @@ class Dysign_Theme_Hooks {
   public function customize_tinymce($init) {
     // Keep only useful styles
     $init['block_formats'] = 'Paragraphe=p;Titre 2=h2;Titre 3=h3;Titre 4=h4';
-    
-    // Force second line toolbar
-    $init['wordpress_adv_hidden'] = FALSE;
 
     return $init;
   }
 
   public function remove_meta_boxes() {
-    remove_meta_box('dashboard_primary', 'dashboard', 'normal');
+    remove_meta_box('dashboard_primary', 'dashboard', 'normal'); // WP News
   }
 
   public function disable_emojicons_tinymce($plugins) {
@@ -164,18 +181,22 @@ class Dysign_Theme_Hooks {
   }
 
   public function dysign_dashboard_widget_function($post, $callback_args) {
-    echo "<p>Votre site est géré par <strong>Maxime BERNARD-JACQUET</strong>.</p>";
 
-    echo '<p style="text-align: center"><a href="http://dysign.fr"><img src="'.get_bloginfo('template_url').'/img/dysign.png" style="width:150px"></a></p>';
+    $html = '
+      <p>Votre site est géré par <strong>Maxime BERNARD-JACQUET</strong>.</p>
+      <p style="text-align: center"><a href="http://dysign.fr"><img src="'.get_bloginfo('template_url').'/img/dysign.png" style="width:150px"></a></p>
+      <p><strong>Me contacter :</strong>
+      <p>Maxime BERNARD-JACQUET<br>
+      06 74 14 03 49<br>
+      <a href="mailto:maxime@dysign.fr">maxime@dysign.fr</a>';
 
-    echo "<p><strong>Me contacter :</strong>";
-    echo "<p>Maxime BERNARD-JACQUET<br>";
-    echo "06 74 14 03 49<br>";
-    echo '<a href="mailto:maxime@dysign.fr">maxime@dysign.fr</a>';
+    echo $html;
   }
 
   public function change_footer() {
-    echo "Crée par <a href='http://www.dysign.fr/' target='_blank'>Dysign</a>, propulsé par <a href='http://wordpress.org' target='_blank'>WordPress</a>";
+    $html = 'Crée par <a href="http://www.dysign.fr/" target="_blank">Dysign</a>, propulsé par <a href="http://wordpress.org" target="_blank">WordPress</a>';
+
+    echo $html;
   }
 
   public function remove_menu_pages() {
@@ -208,7 +229,7 @@ class Dysign_Theme_Hooks {
     wp_enqueue_style('custom-admin', get_template_directory_uri().'/css/admin.css');
   }
 
-  
+
 
   /*  ====================  */
   /*  = Global Functions =  */

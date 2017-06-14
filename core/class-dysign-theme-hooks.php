@@ -9,7 +9,7 @@ class Dysign_Theme_Hooks {
 
   private function register_hooks() {
 
-    if(MAINTENANCE) {
+    if(defined('MAINTENANCE') and MAINTENANCE) {
       add_action('get_header', array($this, 'activate_maintenance'));
     }
 

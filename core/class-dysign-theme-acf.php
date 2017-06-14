@@ -1,25 +1,28 @@
 <?php
 
 class Dysign_Theme_ACF {
-  
+
   const ACF = "acf-pro/acf.php";
-  
+
   public function execute() {
     $this->register_hooks();
-  }  
-
-  protected function register_hooks() {
-    add_filter('plugin_action_links', array($this, 'disallow_acf_deactivation'), 10, 4); 
-    add_filter('acf/settings/save_json', array($this, 'acf_json_save_groups'));
-    //add_action('init', array($this, 'set_options_pages'));
   }
 
-  function disallow_acf_deactivation($actions, $plugin_file, $plugin_data, $context) {  
+  protected function register_hooks() {
+    add_filter('plugin_action_links', array($this, 'disallow_acf_deactivation'), 10, 4);
+    add_filter('acf/settings/save_json', array($this, 'acf_json_save_groups'));
+    //add_action('init', array($this, 'set_options_pages'));
+
+    // Remove WP Custom Fields for better performance
+    add_filter('acf/settings/remove_wp_meta_box', '__return_true');
+  }
+
+  function disallow_acf_deactivation($actions, $plugin_file, $plugin_data, $context) {
     if (array_key_exists('deactivate', $actions) and $plugin_file == self::ACF) {
       unset( $actions['deactivate'] );
-    } 
+    }
     return $actions;
-  } 
+  }
 
   public function json_save_groups($path) {
     $path = get_stylesheet_directory() . '/acf-json';

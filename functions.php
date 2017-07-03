@@ -6,18 +6,6 @@ require_once(__DIR__ . '/vendor/autoload.php');
 // Timber
 $timber = new \Timber\Timber();
 
-if (!class_exists('Timber')) {
-  
-  // Backend
-  add_action( 'admin_notices', function() {
-    echo '<div class="error"><p>Timber not activated. Make sure you activate the plugin in <a href="'. admin_url('plugins.php#timber').'">'.admin_url('plugins.php' ).'</a></p></div>';
-  });
-
-  // Frontend
-  if(!is_admin()) {
-    wp_die('Timber not activated. Make sure you activate the plugin in <a href="/wp-admin/plugins.php#timber">/wp-admin/plugins.php</a>');
-  }
-}
 
 // Hooks
 include get_template_directory().'/core/class-dysign-theme-hooks.php';
@@ -58,4 +46,3 @@ $dysign_theme_api->execute();
 //include get_template_directory().'/core/class-dysign-theme-api.php';
 //$dysign_theme_api = new Dysign_Theme_API();
 //$dysign_theme_api->execute();
-

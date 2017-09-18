@@ -1,6 +1,7 @@
 const gulp = require("gulp")
 const stylus = require("gulp-stylus")
 const autoprefixer = require("gulp-autoprefixer")
+const plumber = require("gulp-plumber")
 
 const bs = require("browser-sync").create() // create a browser sync instance.
 
@@ -16,6 +17,7 @@ gulp.task("browser-sync", function() {
 gulp.task("stylus", function() {
   return gulp
     .src("./stylus/main.styl")
+    .pipe(plumber())
     .pipe(
       stylus({
         compress: true

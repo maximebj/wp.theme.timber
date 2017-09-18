@@ -28,18 +28,15 @@ class Dysign_Theme_Timber extends TimberSite {
 
   // Improve Twig
   public function add_to_twig($twig) {
-    // this is where you can add your own functions to twig
-    //$twig->addExtension( new Twig_Extension_StringLoader() );
-    //$twig->addFilter('myfoo', new Twig_SimpleFilter('myfoo', array($this, 'myfoo')));
+    $twig->addFilter('output_svg', new Twig_SimpleFilter('output_svg', array($this, 'output_svg')));
 
     return $twig;
   }
 
-  // Demo Twig filter
-  public function filter($text) {
-    $text .= ' <= Timber custom-filtered thing!';
-
-    return $text;
+  // SVG embedder Twig filter
+  public function output_svg($svg_url) {
+    $url = get_bloginfo('template_url').'/img/'.$svg_url;
+    return file_get_contents($url);
   }
 
 }

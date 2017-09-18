@@ -10,7 +10,7 @@ class Dysign_Theme_ACF {
 
   protected function register_hooks() {
     add_filter('plugin_action_links', array($this, 'disallow_acf_deactivation'), 10, 4);
-    add_filter('acf/settings/save_json', array($this, 'acf_json_save_groups'));
+    add_filter('acf/settings/save_json', array($this, 'json_save_groups'));
     //add_action('init', array($this, 'set_options_pages'));
 
     // Remove WP Custom Fields for better performance

@@ -46,3 +46,8 @@ $dysign_theme_api->execute();
 //include get_template_directory().'/core/class-dysign-theme-api.php';
 //$dysign_theme_api = new Dysign_Theme_API();
 //$dysign_theme_api->execute();
+
+// TGM Plugin Activation
+include get_template_directory().'/core/class-dysign-theme-dependencies.php';
+$dysign_theme_api = new Dysign_Theme_Dependencies();
+$dysign_theme_api->execute();

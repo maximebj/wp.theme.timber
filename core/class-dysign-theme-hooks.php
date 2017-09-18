@@ -19,6 +19,7 @@ class Dysign_Theme_Hooks {
     add_action('wp_enqueue_scripts', array($this, 'register_assets'));
     add_action('init', array($this, 'change_author_permalinks'));
 
+    //add_filter( 'gform_init_scripts_footer', '__return_true' );
     //add_action('widgets_init', array($this, 'register_sidebars'));
     //add_filter('excerpt_length', array($this, 'set_excerpt_length'));
     //add_filter('excerpt_more', array($this, 'set_excerpt_suffixe'));

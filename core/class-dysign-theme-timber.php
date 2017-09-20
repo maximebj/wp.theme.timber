@@ -4,6 +4,9 @@ class Dysign_Theme_Timber extends TimberSite {
 
   public function execute() {
     $this->register_hooks();
+
+    // Define Twig directories
+    Timber::$dirname = array('views', 'views/parts', 'views/ajax');
   }
 
   private function register_hooks() {

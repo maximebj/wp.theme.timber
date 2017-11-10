@@ -22,6 +22,14 @@ class TestTimberIntegrations extends Timber_UnitTestCase {
 		$this->assertEquals( 'foobar', $str );
 	}
 
+	function testWPPostConvert() {
+		$pid = $this->factory->post->create();
+		$wp_post = get_post( $pid );
+		$post = new TimberPost();
+		$timber_post = $post->convert( $wp_post, 'TimberPost' );
+		$this->assertTrue( $timber_post instanceof TimberPost );
+	}
+
 	function testACFHasFieldPostFalse() {
 		$pid = $this->factory->post->create();
 		$str = '{% if post.has_field("heythisdoesntexist") %}FAILED{% else %}WORKS{% endif %}';
@@ -71,7 +79,7 @@ class TestTimberIntegrations extends Timber_UnitTestCase {
 	function testWPCLIClearCacheTimber(){
 		$str = Timber::compile('assets/single.twig', array('rand' => 4004), 600);
 		$success = Command::clear_cache('timber');
-		$this->assertTrue($success);
+		$this->assertGreaterThan(0, $success);
 	}
 
 	function testWPCLIClearCacheTwig(){

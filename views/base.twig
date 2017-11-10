@@ -17,7 +17,7 @@
     <div class="wrapper">
       <a href="{{site.url}}">{{site.name}}</a>
       <ul class="main-nav">
-      {% for item in main_menu.get_items %}
+      {% for item in wp.menus.main.items %}
         <li class="nav-main-item"><a class="nav-main-link" href="{{item.get_path}}">{{item.title}}</a>
       {% endfor %}
       </ul>
@@ -30,7 +30,7 @@
   <footer class="footer">
     <div class="wrapper">
       <ul class="main-nav">
-      {% for item in footer_menu.get_items %}
+      {% for item in wp.menus.footer.items %}
         <li class="nav-main-item"><a class="nav-main-link" href="{{item.get_path}}">{{item.title}}</a>
       {% endfor %}
       </ul>

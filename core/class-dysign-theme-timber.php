@@ -10,28 +10,31 @@ class Dysign_Theme_Timber extends TimberSite {
   }
 
   private function register_hooks() {
-    add_filter('timber_context', array($this, 'add_to_context'));
-    add_filter('get_twig', array($this, 'add_to_twig'));
+    add_filter('timber/context', array($this, 'add_to_context'));
+    add_filter('timber/twig', array($this, 'add_to_twig'));
   }
 
   // Global context, available to all templates
   function add_to_context($context) {
 
-    // Menus
-    $context['main_menu'] = new TimberMenu('main');
-    $context['footer_menu'] = new TimberMenu('footer');
+    // WP Templates
+    $context['wp']['template'] = array(
+      'front_page' => is_front_page(),
+      'blog' => is_home(),
+    );
 
-    // Sidebar
-    if(is_single() or is_archive() or is_home() or is_front_page()):
-      $context['sidebar'] = Timber::get_widgets('Blog');
-    endif;
+    // Menus
+    $context['wp']['menus'] = array(
+      "main" => new Timber\Menu('main'),
+      "footer" => new Timber\Menu('footer'),
+    );
 
     return $context;
   }
 
   // Improve Twig
   public function add_to_twig($twig) {
-    $twig->addFilter('output_svg', new Twig_SimpleFilter('output_svg', array($this, 'output_svg')));
+    $twig->addFilter(new Twig_SimpleFilter('output_svg', array($this, 'output_svg')));
 
     return $twig;
   }

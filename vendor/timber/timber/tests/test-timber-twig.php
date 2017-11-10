@@ -12,19 +12,26 @@
 			}
 		}
 
-		function _setupTranslationFiles() {
-			$lang_dir = get_stylesheet_directory().'/languages';
-			if (file_exists($lang_dir.'/en_US.po' )) {
-				return;
+		function installTranlsationFiles( $lang_dir ) {
+			if( !is_dir($lang_dir) ) {
+				mkdir($lang_dir , 0777, true);
 			}
-			if(!is_dir($lang_dir)) {
-				mkdir($lang_dir , 0777);
-        	}
 			copy( __DIR__.'/assets/languages/en_US.po', $lang_dir.'/en_US.po' );
 			copy( __DIR__.'/assets/languages/en_US.mo', $lang_dir.'/en_US.mo' );
-			$theme = wp_get_theme();
-			$td = $theme->get('TextDomain');
+			return true;
+		}
+
+		function _setupTranslationFiles() {
+			$lang_dir = get_stylesheet_directory().'/languages';
+			
+			if ( !file_exists($lang_dir.'/en_US.po') ) {
+				$this->installTranlsationFiles($lang_dir);
+			}
+
+			$td = 'timber_test_theme';
 			load_theme_textdomain($td, $lang_dir);
+
+			return $td;
 		}
 
 		function testFormat() {
@@ -34,33 +41,25 @@
 		}
 
 		function testTranslate() {
-			$this->_setupTranslationFiles();
-
-			$theme = wp_get_theme();
-			$td = $theme->get('TextDomain');
-			$str = "I like {{ __('thingy', '$td')}}";
+			$td = $this->_setupTranslationFiles();
+			$str = "I like {{ __('thingy', '$td') }}";
 			$return = Timber::compile_string($str, array('foo' => 'foo'));
 			$this->assertEquals('I like Cheesy Poofs', $return);
 
-			$str = "I like {{ __('doobie', '$td')}}";
+			$str = "I like {{ __('doobie', '$td') }}";
 			$return = Timber::compile_string($str, array('foo' => 'foo'));
 			$this->assertEquals('I like doobie', $return);
 		}
 
 		function testTranslateAndFormat() {
-			$this->_setupTranslationFiles();
-			sleep(1);
-			$theme = wp_get_theme();
-			$td = $theme->get('TextDomain');
+			$td = $this->_setupTranslationFiles();
 
 			$str = "You like {{__('%s', '$td')|format('thingy')}}";
 			$return = Timber::compile_string($str);
 			$this->assertEquals('You like thingy', $return);
-
 			$str = "You like {{__('%s'|format('thingy'), '$td')}}";
 			$return = Timber::compile_string($str);
 			$this->assertEquals('You like Cheesy Poofs', $return);
-
 		}
 
 		function testDoAction(){
@@ -177,6 +176,12 @@
 			$gettysburg = 'Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.';
 			$str = Timber::compile_string("{{address | truncate(6)}}", array('address' => $gettysburg));
 			$this->assertEquals('Four score and seven years ago&hellip;', $str);
+		}
+
+		function testFilterTrimCharacters() {
+			$gettysburg = 'Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.';
+			$str = Timber::compile_string("{{content | excerpt_chars(100)}}", array('content' => $gettysburg));
+			$this->assertEquals('Four score and seven years ago our fathers brought forth on this continent, a new nation, co&hellip;', $str);
 		}
 
 		function testSetSimple() {

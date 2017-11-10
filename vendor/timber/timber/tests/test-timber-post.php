@@ -17,7 +17,6 @@
 			$post_id = $this->factory->post->create(array('post_password' => 'jiggypoof'));
 			$post = new TimberPost($post_id);
 			$this->assertTrue($post->password_required());
-			
 		}
 
 		function testNameMethod() {
@@ -167,15 +166,21 @@
         	} else {
 				register_taxonomy('pizza', 'post');
 				$posts = array();
-				for($i = 0; $i<3; $i++){
+				for( $i = 0; $i < 3; $i++ ){
 					$j = $i + 1;
-					$posts[] = $this->factory->post->create(array('post_date' => '2014-02-0'.$j.' 12:00:00'));
+					$posts[] = $this->factory->post->create(array('post_date' => '2014-02-0'.$j.' 12:00:00', 'post_title' => "Pizza $j is so good!"));
 				}
-				wp_set_object_terms($posts[0], 'Cheese', 'pizza', false);
-				wp_set_object_terms($posts[2], 'Cheese', 'pizza', false);
+				$cat = wp_insert_term('Cheese', 'pizza');
+				self::set_object_terms($posts[0], $cat, 'pizza', false);
+				self::set_object_terms($posts[2], $cat, 'pizza', false);
 				$lastPost = new TimberPost($posts[2]);
-				$prevPost = new TimberPost($posts[0]);
-				$this->assertEquals($lastPost->prev('pizza')->ID, $prevPost->ID);
+				// echo "\n".'$lastPost'."\n";
+				// print_r($lastPost);
+				// echo "\n".'$lastPost->prev(pizza)'."\n";
+				// print_r($lastPost->prev('pizza'));
+				// echo "posts\n";
+				// print_r($posts);
+				$this->assertEquals($posts[0], $lastPost->prev('pizza')->ID);
 			}
 		}
 
@@ -185,8 +190,9 @@
 				$j = $i + 1;
 				$posts[] = $this->factory->post->create(array('post_date' => '2014-02-0'.$j.' 12:00:00'));
 			}
-			wp_set_object_terms($posts[0], 'TestMe', 'category', false);
-			wp_set_object_terms($posts[2], 'TestMe', 'category', false);
+			$cat = wp_insert_term('TestMe', 'category');
+			self::set_object_terms($posts[0], $cat, 'category', false);
+			self::set_object_terms($posts[2], $cat, 'category', false);
 			$lastPost = new TimberPost($posts[2]);
 			$prevPost = new TimberPost($posts[0]);
 			$this->assertEquals($lastPost->prev('category')->ID, $prevPost->ID);
@@ -201,9 +207,8 @@
 			$firstPost = new TimberPost($posts[0]);
 			$nextPost = new TimberPost($posts[1]);
 			$nextPostAfter = new TimberPost($posts[2]);
-			$nextPost->post_status = 'draft';
-			wp_update_post($nextPost);
-			$this->assertEquals($firstPost->next()->ID, $nextPostAfter->ID);
+			wp_update_post( array('ID' =>$nextPost->ID, 'post_status' => 'draft') );
+			$this->assertEquals($nextPostAfter->ID, $firstPost->next()->ID);
 		}
 
 		function testNextWithDraft(){
@@ -472,6 +477,16 @@
 			global $wpdb;
 			$query = "DELETE from $wpdb->users WHERE ID > 1";
 			$wpdb->query($query);
+			$query = "truncate $wpdb->term_relationships";
+			$wpdb->query($query);
+			$query = "truncate $wpdb->term_taxonomy";
+			$wpdb->query($query);
+			$query = "truncate $wpdb->terms";
+			$wpdb->query($query);
+			$query = "truncate $wpdb->termmeta";
+			$wpdb->query($query);
+			$query = "truncate $wpdb->posts";
+			$wpdb->query($query);
 		}
 
 		function testPostFormat() {
@@ -482,8 +497,45 @@
 			$this->assertEquals('aside', $post->format());
 		}
 
+		function testPostClassInTwig(){
+			$pid = $this->factory->post->create();
+			$category = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $category, 'category', true);
+			$post = new TimberPost($pid);
+			$str = Timber::compile_string("{{ post.class }}", array('post' => $post));
+			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized', $str);
+		}
+
 		function testPostClass(){
 			$pid = $this->factory->post->create();
+			$category = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $category, 'category', true);
+			$post = new TimberPost($pid);
+			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized', $post->post_class());
+		}
+
+		function testCssClass(){
+			$pid = $this->factory->post->create();
+			$category = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $category, 'category', true);
+			$post = new TimberPost($pid);
+			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized', $post->css_class());
+			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized additional-css-class', $post->css_class('additional-css-class'));
+		}
+
+		function testCssClassMagicCall(){
+			$pid = $this->factory->post->create();
+			$category = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $category, 'category', true);
+			$post = new TimberPost($pid);
+			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized', $post->class());
+			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized additional-css-class', $post->class('additional-css-class'));
+		}
+
+		function testCssClassMagicGet(){
+			$pid = $this->factory->post->create();
+			$category = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $category, 'category', true);
 			$post = new TimberPost($pid);
 			$this->assertEquals('post-'.$pid.' post type-post status-publish format-standard hentry category-uncategorized', $post->class);
 		}
@@ -495,12 +547,29 @@
 			$this->assertEquals(8, count($parent->children()));
 		}
 
+		function testPostChildrenOfInheritStatus(){
+			$parent_id = $this->factory->post->create();
+			$children = $this->factory->post->create_many(4, array('post_parent' => $parent_id));
+			$children = $this->factory->post->create_many(4, array('post_parent' => $parent_id,
+			                                                       'post_status' => 'inherit'));
+			$parent = new TimberPost($parent_id);
+			$this->assertEquals(8, count($parent->children()));
+		}
+
 		function testPostChildrenOfParentType(){
 			$parent_id = $this->factory->post->create(array('post_type' => 'foo'));
 			$children = $this->factory->post->create_many(8, array('post_parent' => $parent_id));
 			$children = $this->factory->post->create_many(4, array('post_parent' => $parent_id, 'post_type' => 'foo'));
 			$parent = new TimberPost($parent_id);
 			$this->assertEquals(4, count($parent->children('parent')));
+		}
+
+		function testPostChildrenWithArray(){
+			$parent_id = $this->factory->post->create(array('post_type' => 'foo'));
+			$children = $this->factory->post->create_many(8, array('post_parent' => $parent_id, 'post_type' => 'bar'));
+			$children = $this->factory->post->create_many(4, array('post_parent' => $parent_id, 'post_type' => 'foo'));
+			$parent = new TimberPost($parent_id);
+			$this->assertEquals(12, count($parent->children(array('foo', 'bar'))));
 		}
 
 		function testPostNoConstructorArgument(){
@@ -530,23 +599,24 @@
 		function testPostCategory(){
 			$cat = wp_insert_term('News', 'category');
 			$pid = $this->factory->post->create();
-			wp_set_object_terms($pid, $cat['term_id'], 'category');
+			self::set_object_terms($pid, $cat, 'category');
 			$post = new TimberPost($pid);
 			$this->assertEquals('News', $post->category()->name);
 		}
 
 		function testPostCategories() {
 			$pid = $this->factory->post->create();
+			$cat = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $cat, 'category');
 			$post = new TimberPost($pid);
 			$category_names = array('News', 'Sports', 'Obits');
 
 			// Uncategorized is applied by default
 			$default_categories = $post->categories();
 			$this->assertEquals('uncategorized', $default_categories[0]->slug);
-
 			foreach ( $category_names as $category_name ) {
 				$category_name = wp_insert_term($category_name, 'category');
-				wp_set_object_terms($pid, $category_name['term_id'], 'category', true);
+				self::set_object_terms($pid, $category_name, 'category');
 			}
 
 			$this->assertEquals(count($default_categories) + count($category_names), count($post->categories()));
@@ -568,10 +638,12 @@
 		function testPostTerms() {
 			$pid = $this->factory->post->create();
 			$post = new TimberPost($pid);
+			$category = wp_insert_term('Uncategorized', 'category');
+			self::set_object_terms($pid, $category, 'category');
 
 			// create a new tag and associate it with the post
 			$dummy_tag = wp_insert_term('whatever', 'post_tag');
-			wp_set_object_terms($pid, $dummy_tag['term_id'], 'post_tag', true);
+			self::set_object_terms($pid, $dummy_tag, 'post_tag');
 
 			// test expected tags
 			$timber_tags = $post->terms('post_tag');
@@ -585,7 +657,7 @@
 
 			foreach ( $team_names as $team_name ) {
 				$team_term = wp_insert_term($team_name, 'team');
-				wp_set_object_terms($pid, $team_term['term_id'], 'team', true);
+				self::set_object_terms($pid, $team_term, 'team');
 			}
 
 			$this->assertEquals(count($team_names), count($post->terms('team')));
@@ -617,6 +689,39 @@
 			// test multiple taxonomies
 			$post_tag_and_team_terms = $post->terms(array('post_tag','team'));
 			$this->assertEquals(count($post_tag_terms) + count($post_team_terms), count($post_tag_and_team_terms));
+		}
+
+		function set_object_terms( $pid, $term_info, $taxonomy = 'post_tag' , $append = true ) {
+			$term_id = 0;
+			if ( is_array($term_info) ) {
+				$term_id = $term_info['term_id'];
+			} else if ( is_object($term_info) && get_class($term_info) == 'WP_Error' ) {
+				$term_id = $term_info->error_data['term_exists'];
+			}
+			if ( $term_id ) {
+				wp_set_object_terms($pid, $term_id, $taxonomy, $append);
+			}
+		}
+
+		function testPostTermClass() {
+			$class_name = 'TimberTermSubclass';
+			require_once('php/timber-term-subclass.php');
+
+			// create new post
+			$pid = $this->factory->post->create();
+			$post = new TimberPost($pid);
+
+			// create a new tag, associate with post
+			$dummy_tag = wp_insert_term('whatever', 'post_tag');
+			self::set_object_terms($pid, $dummy_tag, 'post_tag');
+
+			// test return class
+			$terms = $post->terms('post_tag', true, $class_name);
+			$this->assertEquals($class_name, get_class($terms[0]));
+
+			// test return class for deprecated $post->get_terms
+			$get_terms = $post->get_terms('post_tag', true, $class_name);
+			$this->assertEquals($class_name, get_class($get_terms[0]));
 		}
 
 		function testPostContentLength() {

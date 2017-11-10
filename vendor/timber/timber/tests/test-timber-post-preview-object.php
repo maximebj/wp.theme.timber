@@ -2,12 +2,58 @@
 
 	class TestTimberPostPreviewObject extends Timber_UnitTestCase {
 
+		protected $gettysburg = 'Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.';
+
+		function testPreviewWithStyleTags() {
+			global $wpdb;
+			$style = '<style>body { background-color: red; }</style><b>Yo.</b> ';
+			$id = $wpdb->insert( 
+				$wpdb->posts, 
+				array( 
+					'post_author' => '1', 
+					'post_content' => $style.$this->gettysburg,
+					'post_title' => 'Thing',
+					'post_date' => '2017-03-01 00:21:40',
+					'post_date_gmt' => '2017-03-01 00:21:40'
+				)
+			);
+			$post_id = $wpdb->insert_id;
+			$post = new TimberPost($post_id);
+			$template = '{{ post.preview.length(9).read_more(false).strip(true) }}';
+			$str = Timber::compile_string($template, array('post' => $post));
+			$this->assertEquals('Yo. Four score and seven years ago our fathers&hellip;', $str);
+		}
+
 		function testPreviewTags() {
 			$post_id = $this->factory->post->create(array('post_excerpt' => 'It turned out that just about anyone in authority — cops, judges, city leaders — was in on the game.'));
 			$post = new TimberPost($post_id);
 			$template = '{{post.preview.length(3).read_more(false).strip(false)}}';
 			$str = Timber::compile_string($template, array('post' => $post));
 			$this->assertNotContains('</p>', $str);
+		}
+
+		function testPostPreviewObjectWithCharAndWordLengthWordsWin() {
+			$pid = $this->factory->post->create( array('post_content' => $this->gettysburg, 'post_excerpt' => '') );
+			$template = '{{ post.preview.length(2).chars(20) }}';
+			$post = new TimberPost($pid);
+			$str = Timber::compile_string($template, array('post' => $post));
+			$this->assertEquals('Four score&hellip; <a href="http://example.org/?p='.$pid.'" class="read-more">Read More</a>', $str);
+		}
+
+		function testPostPreviewObjectWithCharAndWordLengthCharsWin() {
+			$pid = $this->factory->post->create( array('post_content' => $this->gettysburg, 'post_excerpt' => '') );
+			$template = '{{ post.preview.length(20).chars(20) }}';
+			$post = new TimberPost($pid);
+			$str = Timber::compile_string($template, array('post' => $post));
+			$this->assertEquals('Four score and seven&hellip; <a href="http://example.org/?p='.$pid.'" class="read-more">Read More</a>', $str);
+		}
+
+		function testPostPreviewObjectWithCharLength() {
+			$pid = $this->factory->post->create( array('post_content' => $this->gettysburg, 'post_excerpt' => '') );
+			$template = '{{ post.preview.chars(20) }}';
+			$post = new TimberPost($pid);
+			$str = Timber::compile_string($template, array('post' => $post));
+			$this->assertEquals('Four score and seven&hellip; <a href="http://example.org/?p='.$pid.'" class="read-more">Read More</a>', $str);
 		}
 
 		function testPostPreviewObjectWithLength() {

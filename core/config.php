@@ -1,6 +1,8 @@
 <?php
 
-class Dysign_Theme_Hooks {
+namespace DysignTheme\Core;
+
+class Config {
 
   public function execute() {
     $this->register_hooks();

@@ -1,6 +1,8 @@
 <?php
 
-class Dysign_Theme_CPT {
+namespace DysignTheme\Core;
+
+class CPT {
 
   public function execute() {
     $this->register_hooks();

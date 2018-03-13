@@ -1,6 +1,8 @@
 <?php
 
-class Dysign_Theme_Features {
+namespace DysignTheme\Core;
+
+class Features {
 
   public function execute() {
     $this->register_hooks();
@@ -15,7 +17,7 @@ class Dysign_Theme_Features {
   public function pre_get_posts($wp_query) {
 
     if($wp_query->is_main_query() and !is_admin() and (is_home() or is_archive())):
-      
+
     /*
       // add params
       $wp_query->set('meta_key', 'score');

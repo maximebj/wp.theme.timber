@@ -1,6 +1,8 @@
 <?php
 
-class Dysign_Theme_ACF {
+namespace DysignTheme\Core;
+
+class ACF {
 
   const ACF = "acf-pro/acf.php";
 

@@ -1,6 +1,8 @@
 <?php
 
-class Dysign_Theme_Ajax {
+namespace DysignTheme\Core;
+
+class Ajax {
 
   public function execute() {
     $this->register_hooks();
@@ -30,7 +32,7 @@ class Dysign_Theme_Ajax {
 }
 
 /*
-  Put in Front : 
+  Put in Front :
 
   $('body').on('change', '#s', function() {
     var keyword = $(this).val();

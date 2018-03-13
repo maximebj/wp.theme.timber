@@ -1,6 +1,8 @@
 <?php
 
-class Dysign_Theme_Dependencies {
+namespace DysignTheme\Core;
+
+class Dependencies {
 
   public $tgma;
 
@@ -8,8 +10,8 @@ class Dysign_Theme_Dependencies {
 
     // TGM Plugin Activation
     // From http://tgmpluginactivation.com/
-    include get_template_directory().'/core/class-tgm-plugin-activation.php';
-    $this->tgmpa = new TGM_Plugin_Activation();
+    include get_template_directory().'/core/lib/tgm-plugin-activation.php';
+    $this->tgmpa = new \TGM_Plugin_Activation();
 
 
     add_action('tgmpa_register', array($this, 'delipress_register_required_plugins'));

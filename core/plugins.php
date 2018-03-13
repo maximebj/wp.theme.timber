@@ -1,6 +1,8 @@
-<?php 
+<?php
 
-class Dysign_Theme_Plugins {
+namespace DysignTheme\Core;
+
+class Plugins {
 
   public function execute() {
     $this->register_hooks();
@@ -11,7 +13,7 @@ class Dysign_Theme_Plugins {
     add_filter('manage_edit-post_columns', array($this, 'yoast_clean_columns'), 10, 1);
     add_filter('manage_edit-page_columns', array($this, 'yoast_clean_columns'), 10, 1);
     add_action('wp_before_admin_bar_render', array($this, 'yoast_clean_admin_bar'));
-    
+
     //add_action('add_meta_boxes', array($this,'remove_monarch_meta_boxes'));
   }
 
@@ -22,7 +24,7 @@ class Dysign_Theme_Plugins {
   public function yoast_clean_columns($columns) {
     unset($columns['wpseo-readability']);
     unset($columns['wpseo-score']);
-    
+
     return $columns;
   }
 
@@ -33,11 +35,11 @@ class Dysign_Theme_Plugins {
 
   public function remove_monarch_meta_boxes() {
     if (is_admin()){
-      
+
       // post
       remove_meta_box('et_monarch_settings', 'post', 'advanced');
       remove_meta_box('et_monarch_sharing_stats', 'post', 'advanced');
-      
+
       // page
       remove_meta_box('et_monarch_settings', 'page', 'advanced');
       remove_meta_box('et_monarch_sharing_stats', 'page', 'advanced');

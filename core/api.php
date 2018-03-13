@@ -1,6 +1,8 @@
-<?php 
+<?php
 
-class Dysign_Theme_API {
+namespace DysignTheme\Core;
+
+class API {
 
   public function execute() {
     $this->register_hooks();

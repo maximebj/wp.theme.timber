@@ -1,12 +1,14 @@
 <?php
 
-class Dysign_Theme_Timber extends TimberSite {
+namespace DysignTheme\Core;
+
+class Timber extends TimberSite {
 
   public function execute() {
     $this->register_hooks();
 
     // Define Twig directories
-    Timber::$dirname = array('views', 'views/parts', 'views/ajax');
+    \Timber::$dirname = array('views', 'views/parts', 'views/ajax');
   }
 
   private function register_hooks() {
@@ -25,8 +27,8 @@ class Dysign_Theme_Timber extends TimberSite {
 
     // Menus
     $context['wp']['menus'] = array(
-      "main" => new Timber\Menu('main'),
-      "footer" => new Timber\Menu('footer'),
+      "main" => new \Timber\Menu('main'),
+      "footer" => new \Timber\Menu('footer'),
     );
 
     return $context;
@@ -34,7 +36,7 @@ class Dysign_Theme_Timber extends TimberSite {
 
   // Improve Twig
   public function add_to_twig($twig) {
-    $twig->addFilter(new Twig_SimpleFilter('output_svg', array($this, 'output_svg')));
+    $twig->addFilter(new \Twig_SimpleFilter('output_svg', array($this, 'output_svg')));
 
     return $twig;
   }

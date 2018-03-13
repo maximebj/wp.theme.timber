@@ -1,53 +1,69 @@
 <?php
 
-// Composer
-require_once(__DIR__ . '/vendor/autoload.php');
+namespace DysignTheme;
 
-// Timber
+use DysignTheme\Core\Config;
+use DysignTheme\Core\CPT;
+use DysignTheme\Core\Features;
+use DysignTheme\Core\ACF;
+use DysignTheme\Core\Ajax;
+use DysignTheme\Core\Plugins;
+use DysignTheme\Core\API;
+use DysignTheme\Core\Timber;
+
+
+require_once(__DIR__ . '/vendor/autoload.php');
 $timber = new \Timber\Timber();
 
 
-// Hooks
-include get_template_directory().'/core/class-dysign-theme-hooks.php';
-$dysign_theme_hooks = new Dysign_Theme_Hooks();
-$dysign_theme_hooks->execute();
+class DysignTheme {
 
-// Post Types
-include get_template_directory().'/core/class-dysign-theme-cpt.php';
-$dysign_theme_cpt = new Dysign_Theme_CPT();
-$dysign_theme_cpt->execute();
+  public function run() {
 
-// Theme features
-include get_template_directory().'/core/class-dysign-theme-features.php';
-$dysign_theme_features = new Dysign_Theme_Features();
-$dysign_theme_features->execute();
+    // Includes
+    include get_template_directory().'/core/config.php';
+    include get_template_directory().'/core/cpt.php';
+    include get_template_directory().'/core/features.php';
+    include get_template_directory().'/core/acf.php';
+    include get_template_directory().'/core/ajax.php';
+    include get_template_directory().'/core/plugins.php';
+    include get_template_directory().'/core/api.php';
+    include get_template_directory().'/core/timber.php';
 
-// ACF
-include get_template_directory().'/core/class-dysign-theme-acf.php';
-$dysign_theme_acf = new Dysign_Theme_ACF();
-$dysign_theme_acf->execute();
+    // Hooks
+    $config = new Config();
+    $config->execute();
 
-// Ajax
-include get_template_directory().'/core/class-dysign-theme-ajax.php';
-$dysign_theme_ajax = new Dysign_Theme_Ajax();
-$dysign_theme_ajax->execute();
+    // Post Types
+    $cpt = new CPT();
+    $cpt->execute();
 
-// Plugins
-include get_template_directory().'/core/class-dysign-theme-plugins.php';
-$dysign_theme_plugins = new Dysign_Theme_Plugins();
-$dysign_theme_plugins->execute();
+    // Theme features
+    $features = new Features();
+    $features->execute();
 
-// Timber
-include get_template_directory().'/core/class-dysign-theme-timber.php';
-$dysign_theme_api = new Dysign_Theme_Timber();
-$dysign_theme_api->execute();
+    // ACF
+    $acf = new ACF();
+    $acf->execute();
 
-// WP API
-//include get_template_directory().'/core/class-dysign-theme-api.php';
-//$dysign_theme_api = new Dysign_Theme_API();
-//$dysign_theme_api->execute();
+    // Ajax
+    $ajax = new Ajax();
+    $ajax->execute();
 
-// TGM Plugin Activation
-include get_template_directory().'/core/class-dysign-theme-dependencies.php';
-$dysign_theme_api = new Dysign_Theme_Dependencies();
-$dysign_theme_api->execute();
+    // Plugins
+    $plugins = new Plugins();
+    $plugins->execute();
+
+    // WP API
+    $api = new API();
+    $api->execute();
+
+    // Timber
+    $timber = new Timber();
+    $timber->execute();
+
+  }
+}
+
+$dysigntheme = new DysignTheme();
+$dysigntheme->run();

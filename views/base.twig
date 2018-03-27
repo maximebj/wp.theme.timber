@@ -14,7 +14,7 @@
 
 <body class="{{body_class}}">
   <header class="header">
-    <div class="wrapper">
+    <div class="container">
       <a href="{{site.url}}">{{site.name}}</a>
       <ul class="main-nav">
       {% for item in wp.menus.main.items %}
@@ -28,7 +28,7 @@
   {% endblock %}
 
   <footer class="footer">
-    <div class="wrapper">
+    <div class="container">
       <ul class="main-nav">
       {% for item in wp.menus.footer.items %}
         <li class="nav-main-item"><a class="nav-main-link" href="{{item.get_path}}">{{item.title}}</a>

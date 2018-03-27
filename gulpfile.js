@@ -30,7 +30,6 @@ gulp.task("stylus", function() {
     .pipe(bs.reload({ stream: true }))
 })
 
-
 gulp.task("watch", ["browser-sync"], function() {
   gulp.watch("./stylus/**/*.styl", ["stylus"])
   gulp.watch("./*.php").on("change", bs.reload)

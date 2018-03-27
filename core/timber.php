@@ -2,7 +2,7 @@
 
 namespace DysignTheme\Core;
 
-class Timber extends TimberSite {
+class Timber extends \TimberSite {
 
   public function execute() {
     $this->register_hooks();

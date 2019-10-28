@@ -147,8 +147,12 @@ class Config {
   }
 
   public function dequeue_scripts() {
-    //wp_dequeue_script('' );
-    //wp_dequeue_syle('' );
+    // Remove Gutenberg frontend styles
+    wp_dequeue_style( 'wp-block-library' );
+    wp_dequeue_style( 'wp-block-library-theme' );
+
+    // remove WooCommerce stylesheet
+    wp_dequeue_style( 'wc-block-style' );
   }
 
 

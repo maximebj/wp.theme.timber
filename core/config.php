@@ -24,7 +24,7 @@ class Config {
     //add_action( 'widgets_init', array( $this, 'register_sidebars' ) );
     //add_filter( 'excerpt_length', array( $this, 'set_excerpt_length' ) );
     //add_filter( 'excerpt_more', array( $this, 'set_excerpt_suffixe' ) );
-    //add_action( 'wp_print_scripts', array( $this, 'dequeue_scripts'), 100 );
+    //add_action( 'wp_enqueue_scripts', array( $this, 'dequeue_assets'), 1000 );
 
 
     // Admin Hooks
@@ -146,7 +146,8 @@ class Config {
     return '…';
   }
 
-  public function dequeue_scripts() {
+  public function dequeue_assets() {
+    
     // Remove Gutenberg frontend styles
     wp_dequeue_style( 'wp-block-library' );
     wp_dequeue_style( 'wp-block-library-theme' );
